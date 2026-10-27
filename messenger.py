@@ -1,4 +1,5 @@
 from datetime import datetime
+from ast import literal_eval
 
 server_data = {
     'users': [
@@ -19,14 +20,6 @@ server_data = {
     ]
 }
 
-u = []
-for d in server_data['users']:
-    u.append(d['name'])
-
-g = []
-for d in server_data['channels']:
-    g.append(d['name'])
-
 m = []
 for d in server_data['messages']:
     m.append(d['content'])
@@ -39,7 +32,7 @@ def menu_input():
         return('Bye!')
 
 def users():
-    u = []
+    utilisateurs = []
     identifiants = []
     print('---------option---------')
     print('print users : p')
@@ -47,12 +40,12 @@ def users():
     print('back to the main menu : b')
     print('------------------------')
     for d in server_data['users']:
-        u.append(d['name'])
+        utilisateurs.append(d['name'])
         identifiants.append(d['id'])
     choice = input('what do you want to do ? :')
     if choice == 'p' :
         print('------users list------')
-        for n in u :
+        for n in utilisateurs :
             print(n)
         print('----------------------')
         users()
@@ -66,6 +59,46 @@ def users():
         choice3 = input('give a name :')
         server_data['users'].append({'id': id, 'name': choice3})
         users()
+
+
+def channels():
+    groups = []
+    identifiants = []
+    users = []
+    for d in server_data['channels']:
+        groups.append([ d['id'], d['name']])
+        identifiants.append(d['id'])
+    for d in server_data['users']:
+        users.append([d['id'], d['name']])
+    print('---------option---------')
+    print('print groups : p')
+    print('add group : a')
+    print('back to the main menu : b')
+    print('------------------------')
+    choice = input('what do you want to do ? :')
+    if choice == 'p':
+        for k in range(len(groups)):
+            print('id :', groups[k][0], ', name :', groups[k][1])
+        channels()
+    elif choice == 'b':
+        menu()
+    elif choice == 'a':
+        choice2 = input('give an id :')
+        while int(choice2) in identifiants :
+            choice2 = input('this id is already taken, please give another one :')
+        identifiants.append(int(choice2))
+        choice3 = input('give an id :')
+        while int(choice3) in identifiants :
+            choice3 = input('this id is already taken, please give another one :')
+            identifiants.append(int(choice3))
+        choice4 = input('give a name :')
+        print('-----users id-----')
+        for k in range(len(users)):
+            print('id :', users[k][0], ', name :', users[k][1])
+        print('------------------')
+        choice5 = input('give a list of users to add (please give a list of ids) : ')
+        server_data['channels'].append({'id': int(choice3), 'name': choice4, 'member_ids': l})
+        channels()
 
 
 def menu():
@@ -93,9 +126,8 @@ def menu():
         menu_input()
         
     elif choice =='g':
-        for n in g :
-            print(n)
-        menu_input()
+        channels()
+
     else:
         print('Unknown option:', choice)
 
