@@ -21,10 +21,6 @@ server_data = {
     ]
 }
 
-m = []
-for d in server_data['messages']:
-    m.append(d['content'])
-
 def menu_input():
     choice = input('Do you want to go back to the principal menu (yes or no)? :')
     if choice == 'yes':
@@ -33,25 +29,32 @@ def menu_input():
         return('Bye!')
 
 def users():
+
     utilisateurs = []
     identifiants = []
+
     print('---------option---------')
     print('print users : p')
     print('add user : a')
     print('back to the main menu : b')
     print('------------------------')
+
     for d in server_data['users']:
         utilisateurs.append(d['name'])
         identifiants.append(d['id'])
+
     choice = input('what do you want to do ? :')
+
     if choice == 'p' :
         print('------users list------')
         for k in range(len(utilisateurs)) :
             print('id :', identifiants[k], ', name :', utilisateurs[k])
         print('----------------------')
         users()
+
     elif choice == 'b':
         menu()
+
     elif choice == 'a':
         id = rd.randint(0, 1000)
         while id in identifiants :
@@ -63,9 +66,11 @@ def users():
 
 
 def channels():
+
     groups = []
     identifiants = []
     users = []
+
     for d in server_data['channels']:
         groups.append([ d['id'], d['name']])
         identifiants.append(d['id'])
@@ -103,13 +108,74 @@ def channels():
         channels()
 
 
+def messages():
+
+    print('---------option---------')
+    print('print messages of a group : p')
+    print('back to the main menu : b')
+    print('------------------------')
+
+    choice = input('what do you want to do ? :')
+
+    if choice == 'p':
+        print('---group list---')
+        identifiants = []
+        for d in server_data['channels']:
+            print('id :', d['id'], ', name :', d['name'])
+            identifiants.append(d['id'])
+        print('----------------')
+
+        choice2 = input('give the id of the group : ')
+        if not choice2.isdigit() or int(choice2) not in identifiants:
+            print('Unknown group:', choice2)
+            messages()
+            return
+        channel_id = int(choice2)
+
+        # id -> nom pour retrouver l'envoyeur
+        names = {}
+        for d in server_data['users']:
+            names[d['id']] = d['name']
+
+        # messages du groupe, triés par date
+        group_messages = []
+        for d in server_data['messages']:
+            if d['channel'] == channel_id:
+                group_messages.append(d)
+        group_messages.sort(key=lambda d: d['reception_date'])
+
+        print('-----messages-----')
+        if not group_messages:
+            print('(no messages)')
+        day = None
+        for d in group_messages:
+            date = d['reception_date']
+            if date.date() != day
+                day = date.date()
+                print('------', day.strftime('%d/%m/%Y'), '------')
+            sender = names.get(d['sender_id'], 'Unknown')
+            print(date.strftime('%H:%M:%S'), '|', sender, ':', d['content'])
+        print('------------------')
+        messages()
+
+    elif choice == 'b':
+        menu()
+
+    else:
+        print('Unknown option:', choice)
+        messages()
+
+
 def menu():
+
     print('=== Messenger ===')
     print('u : users')
     print('m : messages')
     print('g : groups')
     print('x : exit')
+
     choice = input('Select an option between u, m, g, x :')
+
     if choice == 'x':
         print('Bye!')
 
@@ -117,15 +183,7 @@ def menu():
         users()
 
     elif choice =='m':
-        print('---group list---')
-        for n in g : 
-                print(n)
-        print('----------------')
-        choice1 = input('from which group do you want the messages ? : ')
-        if choice1 == 'Town square':
-            for n in m :
-                print(n)
-        menu_input()
+        messages()
         
     elif choice =='g':
         channels()
