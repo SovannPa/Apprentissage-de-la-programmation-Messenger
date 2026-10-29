@@ -1,25 +1,12 @@
 from datetime import datetime
 from ast import literal_eval
 import random as rd
+import json
 
-server_data = {
-    'users': [
-        {'id': 41, 'name': 'Alice'},
-        {'id': 23, 'name': 'Bob'}
-    ],
-    'channels': [
-        {'id': 12, 'name': 'Town square', 'member_ids': [41, 23]}
-    ],
-    'messages': [
-        {
-            'id': 18,
-            'reception_date': datetime.now(),
-            'sender_id': 41,
-            'channel': 12,
-            'content': 'Hi 👋'
-        }
-    ]
-}
+def load_server_data_from_file():
+    return json.load(open('storage.json'))
+
+server_data = load_server_data_from_file()
 
 def menu_input():
     choice = input('Do you want to go back to the principal menu (yes or no)? :')
@@ -150,7 +137,7 @@ def messages():
         day = None
         for d in group_messages:
             date = d['reception_date']
-            if date.date() != day
+            if date.date() != day:
                 day = date.date()
                 print('------', day.strftime('%d/%m/%Y'), '------')
             sender = names.get(d['sender_id'], 'Unknown')
@@ -192,3 +179,4 @@ def menu():
         print('Unknown option:', choice)
 
 menu()
+
