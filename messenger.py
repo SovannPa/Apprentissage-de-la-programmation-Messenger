@@ -16,12 +16,18 @@ def serialisation():
 
 #######################################################################################################################################################################
 
-def menu_input():
-    choice = input('Do you want to go back to the principal menu (yes or no)? :')
-    if choice == 'yes':
-        menu()
-    else:
-        return('Bye!')
+def print_users(user_ids=None):
+    print('--------users list--------')
+    for d in server_data['users']:
+        if user_ids is None or d['id'] in user_ids:
+            print('id :', d['id'], ', name :', d['name'])
+    print('--------------------------')
+
+def print_channels():
+    print('--------channels--------')
+    for d in server_data['channels']:
+        print('id :', d['id'], ', name :', d['name'])
+    print('------------------------')
 
 def users():
 
@@ -41,10 +47,7 @@ def users():
     choice = input('what do you want to do ? :')
 
     if choice == 'p' :
-        print('------users list------')
-        for k in range(len(utilisateurs)) :
-            print('id :', identifiants[k], ', name :', utilisateurs[k])
-        print('----------------------')
+        print_users()
         users()
 
     elif choice == 'b':
@@ -60,11 +63,7 @@ def users():
         serialisation()
         users()
 
-def print_users():
-    print('------users list------')
-    for d in server_data['users']:
-        print('id :', d['id'], ', name :', d['name'])
-    print('----------------------')
+
 
 def channels():
 
@@ -87,8 +86,7 @@ def channels():
     choice = input('what do you want to do ? :')
 
     if choice == 'p':
-        for k in range(len(groups)):
-            print('id :', groups[k][0], ', name :', groups[k][1])
+        print_channels()
         channels()
 
     elif choice == 'b':
@@ -119,13 +117,8 @@ def messages():
     choice = input('what do you want to do ? :')
 
     if choice == 'p':
-        print('---group list---')
-        identifiants = []
-        for d in server_data['channels']:
-            print('id :', d['id'], ', name :', d['name'])
-            identifiants.append(d['id'])
-        print('----------------')
-
+        identifiants = [d['id'] for d in server_data['channels']]
+        print_channels()
         choice2 = input('give the id of the group : ')
         if not choice2.isdigit() or int(choice2) not in identifiants:
             print('Unknown group:', choice2)
@@ -163,8 +156,28 @@ def messages():
         menu()
 
     elif choice =='s':
-        print_users()
-        choice2 = input('in which group ? :')
+        print_channels()
+        choice2 = input('in which group ? (id) :')
+        channel_ids = [d['id'] for d in server_data['channels']]
+        if not choice2.isdigit() or int(choice2) not in channel_ids:
+            print('Unknown group:', choice2)
+            messages()
+            return
+        channel = next(d for d in server_data['channels'] if d['id'] == int(choice2))
+        print_users(channel['member_ids'])
+        choice3 = input('who are you ? (id) : ')
+        choice4 = input('type :')
+        identifiants = []
+        for d in server_data['messages']:
+            identifiants.append(d['id'])
+        id = id = rd.randint(0, 1000)
+        while id in identifiants:
+            id = rd.randint(0, 1000)
+        server_data['messages'].append({"id": id, "reception_date": datetime.now().isoformat(timespec='seconds'), "sender_id": int(choice3), "channel": int(choice2), "content": choice4})
+        serialisation()
+        messages()
+
+
         
     else:
         print('Unknown option:', choice)
