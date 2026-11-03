@@ -3,10 +3,18 @@ from ast import literal_eval
 import random as rd
 import json
 
+###############################################################################----JSON----############################################################################
 def load_server_data_from_file():
     return json.load(open('storage.json'))
 
 server_data = load_server_data_from_file()
+
+def serialisation():
+    JSON_FILE_NAME = 'storage.json'
+    with open(JSON_FILE_NAME, 'w') as json_file:
+        json.dump(server_data, json_file)
+
+#######################################################################################################################################################################
 
 def menu_input():
     choice = input('Do you want to go back to the principal menu (yes or no)? :')
@@ -49,8 +57,14 @@ def users():
         identifiants.append(id)
         choice2 = input('give a name :')
         server_data['users'].append({'id': id, 'name': choice2})
+        serialisation()
         users()
 
+def print_users():
+    print('------users list------')
+    for d in server_data['users']:
+        print('id :', d['id'], ', name :', d['name'])
+    print('----------------------')
 
 def channels():
 
@@ -86,19 +100,19 @@ def channels():
             id = rd.randint(0, 1000)
         identifiants.append(id)
         choice3 = input('give a name :')
-        print('-----users id-----')
-        for k in range(len(users)):
-            print('id :', users[k][0], ', name :', users[k][1])
-        print('------------------')
+        print_users()
         choice4 = input('give a list of users to add (please give a list of ids) : ')
         server_data['channels'].append({'id': id, 'name': choice3, 'member_ids': literal_eval(choice4)})
+        serialisation()
         channels()
 
+        
 
 def messages():
 
     print('---------option---------')
     print('print messages of a group : p')
+    print('send message : s')
     print('back to the main menu : b')
     print('------------------------')
 
@@ -136,7 +150,7 @@ def messages():
             print('(no messages)')
         day = None
         for d in group_messages:
-            date = d['reception_date']
+            date = datetime.fromisoformat(d['reception_date'])
             if date.date() != day:
                 day = date.date()
                 print('------', day.strftime('%d/%m/%Y'), '------')
@@ -148,6 +162,10 @@ def messages():
     elif choice == 'b':
         menu()
 
+    elif choice =='s':
+        print_users()
+        choice2 = input('in which group ? :')
+        
     else:
         print('Unknown option:', choice)
         messages()
@@ -179,4 +197,3 @@ def menu():
         print('Unknown option:', choice)
 
 menu()
-
